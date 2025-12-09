@@ -141,10 +141,16 @@ def handle_join_game(data):
 
     join_room(game_id)
 
-    emit('joined_game', {
+    game = games[game_id]
+    response = {
         'player_id': player_id,
         'game_state': get_game_state(game_id)
-    })
+    }
+
+    if game['state'] == 'active_round' and game['current_word']:
+        response['current_word'] = game['current_word']
+
+    emit('joined_game', response)
 
     emit('player_joined', {
         'player_name': player_name,
@@ -818,7 +824,23 @@ HTML_TEMPLATE = """
         socket.on('joined_game', (data) => {
             currentPlayerId = data.player_id;
             currentGameId = data.game_state.game_id;
-            renderLobby(data.game_state);
+            isGuesser = (data.game_state.current_guesser_id === currentPlayerId);
+
+            if (data.game_state.state === 'active_round' && !isGuesser) {
+                document.getElementById('hinter-word').textContent = data.current_word || '';
+                document.getElementById('hinter-timer').textContent = Math.ceil(data.game_state.time_remaining || 60);
+                document.getElementById('hinter-score').textContent = data.game_state.round_score;
+                showScreen('active-round-hinter-screen');
+
+                if (timerInterval) clearInterval(timerInterval);
+                const startTime = Date.now() - ((60 - (data.game_state.time_remaining || 60)) * 1000);
+                timerInterval = setInterval(() => {
+                    const elapsed = (Date.now() - startTime) / 1000;
+                    updateTimer(60 - elapsed);
+                }, 100);
+            } else {
+                renderLobby(data.game_state);
+            }
         });
 
         socket.on('player_joined', (data) => {
