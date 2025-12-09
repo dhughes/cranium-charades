@@ -9,7 +9,7 @@ import uuid
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'cranium-charades-secret-key'
-socketio = SocketIO(app, cors_allowed_origins="*", engineio_logger=True, logger=True)
+socketio = SocketIO(app, cors_allowed_origins="*", path='/cranium-charades/socket.io')
 
 with open('words.json', 'r') as f:
     WORDS = json.load(f)
