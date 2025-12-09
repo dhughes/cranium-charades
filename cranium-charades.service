@@ -1,0 +1,14 @@
+[Unit]
+Description=Cranium Charades - Forehead word guessing game
+After=network.target
+
+[Service]
+Type=simple
+User=dhughes
+WorkingDirectory=/home/dhughes/apps/cranium-charades
+ExecStart=/home/dhughes/apps/cranium-charades/venv/bin/python app.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
