@@ -658,6 +658,52 @@ HTML_TEMPLATE = """
                 transform: translate(-50%, -50%) scale(1);
             }
         }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 500;
+            z-index: 2000;
+            animation: toastSlideIn 0.3s ease-out, toastSlideOut 0.3s ease-in 2.7s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .toast-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes toastSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -683,7 +729,7 @@ HTML_TEMPLATE = """
                     <div class="share-link" id="share-link"></div>
                     <button class="btn-primary" onclick="copyShareLink()">Copy Link</button>
                     <div style="margin-top: 20px;">
-                        <input type="text" id="creator-name" placeholder="Enter your name">
+                        <input type="text" id="creator-name" placeholder="Enter your name" onkeypress="if(event.key === 'Enter') joinAsCreator()">
                         <button class="btn-success" onclick="joinAsCreator()">Join Game</button>
                     </div>
                 </div>
@@ -693,8 +739,8 @@ HTML_TEMPLATE = """
         <div id="join-game-screen" class="screen">
             <h1>Join Game</h1>
             <div class="card">
-                <input type="text" id="join-game-code" placeholder="Enter game code">
-                <input type="text" id="join-player-name" placeholder="Enter your name">
+                <input type="text" id="join-game-code" placeholder="Enter game code" onkeypress="if(event.key === 'Enter') joinGame()">
+                <input type="text" id="join-player-name" placeholder="Enter your name" onkeypress="if(event.key === 'Enter') joinGame()">
                 <button class="btn-primary" onclick="joinGame()">Join</button>
                 <button class="btn-secondary" onclick="showLanding()">Back</button>
             </div>
@@ -791,13 +837,13 @@ HTML_TEMPLATE = """
         function copyShareLink() {
             const link = document.getElementById('share-link').textContent;
             navigator.clipboard.writeText(link);
-            alert('Link copied to clipboard!');
+            showToast('Link copied to clipboard!', 'warning');
         }
 
         function joinAsCreator() {
             const name = document.getElementById('creator-name').value.trim();
             if (!name) {
-                alert('Please enter your name');
+                showToast('Please enter your name', 'warning');
                 return;
             }
             socket.emit('join_game', {
@@ -811,7 +857,7 @@ HTML_TEMPLATE = """
             const playerName = document.getElementById('join-player-name').value.trim();
 
             if (!gameCode || !playerName) {
-                alert('Please enter both game code and your name');
+                showToast('Please enter both game code and your name', 'warning');
                 return;
             }
 
@@ -880,6 +926,17 @@ HTML_TEMPLATE = """
             setTimeout(() => {
                 flash.remove();
             }, 1200);
+        }
+
+        function showToast(message, type = 'error') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         }
 
         function copyGameUrl() {
@@ -1124,7 +1181,7 @@ HTML_TEMPLATE = """
         });
 
         socket.on('error', (data) => {
-            alert(data.message);
+            showToast(data.message, 'error');
         });
 
         if (window.location.pathname.startsWith('/game/')) {
