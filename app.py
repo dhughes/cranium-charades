@@ -131,18 +131,29 @@ def handle_join_game(data):
         emit('error', {'message': 'Game not found'})
         return
 
-    player_id = str(uuid.uuid4())
-    request.sid
+    game = games[game_id]
+    existing_player_id = None
 
-    games[game_id]['players'][player_id] = {
-        'name': player_name,
-        'score': 0,
-        'skips': 0,
-        'connected': True,
-        'sid': request.sid
-    }
-    games[game_id]['last_activity'] = datetime.now()
+    for pid, player in game['players'].items():
+        if player['name'] == player_name:
+            existing_player_id = pid
+            break
 
+    if existing_player_id:
+        player_id = existing_player_id
+        game['players'][player_id]['connected'] = True
+        game['players'][player_id]['sid'] = request.sid
+    else:
+        player_id = str(uuid.uuid4())
+        game['players'][player_id] = {
+            'name': player_name,
+            'score': 0,
+            'skips': 0,
+            'connected': True,
+            'sid': request.sid
+        }
+
+    game['last_activity'] = datetime.now()
     join_room(game_id)
 
     game = games[game_id]
@@ -1041,6 +1052,12 @@ HTML_TEMPLATE = """
             currentGameId = data.game_state.game_id;
             isGuesser = (data.game_state.current_guesser_id === currentPlayerId);
 
+            const player = data.game_state.players.find(p => p.player_id === currentPlayerId);
+            if (player) {
+                localStorage.setItem('cranium_game_id', currentGameId);
+                localStorage.setItem('cranium_player_name', player.name);
+            }
+
             if (data.game_state.state === 'active_round' && !isGuesser) {
                 document.getElementById('hinter-word').textContent = data.current_word || '';
                 document.getElementById('hinter-timer').textContent = Math.ceil(data.game_state.time_remaining || 60);
@@ -1191,8 +1208,31 @@ HTML_TEMPLATE = """
             showToast(data.message, 'error');
         });
 
-        if (window.location.pathname.startsWith('/game/')) {
-            showJoinGame();
+        const path = window.location.pathname;
+        if (path.startsWith('/game/')) {
+            const urlGameCode = path.split('/game/')[1];
+            const savedGameId = localStorage.getItem('cranium_game_id');
+            const savedPlayerName = localStorage.getItem('cranium_player_name');
+
+            if (urlGameCode === savedGameId && savedPlayerName) {
+                const attemptRejoin = () => {
+                    if (!currentGameId) {
+                        currentGameId = urlGameCode;
+                        socket.emit('join_game', {
+                            game_id: urlGameCode,
+                            player_name: savedPlayerName
+                        });
+                    }
+                };
+
+                if (socket.connected) {
+                    attemptRejoin();
+                } else {
+                    socket.on('connect', attemptRejoin);
+                }
+            } else {
+                showJoinGame();
+            }
         }
     </script>
 </body>
