@@ -937,11 +937,12 @@ HTML_TEMPLATE = """
             gameState.players.forEach(player => {
                 const li = document.createElement('li');
                 li.className = 'player-item';
+                li.setAttribute('data-player-id', player.player_id);
 
                 const isCurrentPlayer = player.player_id === currentPlayerId;
                 const nameDisplay = isCurrentPlayer
                     ? `<span class="player-name-editable" onclick="editPlayerName('${player.player_id}', '${player.name}')">${player.name} ✏️</span>`
-                    : `<span>${player.name}${player.connected ? '' : ' (disconnected)'}</span>`;
+                    : `<span class="player-name">${player.name}${player.connected ? '' : ' (disconnected)'}</span>`;
 
                 li.innerHTML = `
                     ${nameDisplay}
@@ -991,8 +992,29 @@ HTML_TEMPLATE = """
         });
 
         socket.on('player_renamed', (data) => {
-            if (data.game_state.state === 'lobby') {
-                renderLobby(data.game_state);
+            currentGameState = data.game_state;
+
+            const listItem = document.querySelector(`[data-player-id="${data.player_id}"]`);
+            if (!listItem) return;
+
+            if (listItem.querySelector('#edit-name-input')) {
+                return;
+            }
+
+            const player = data.game_state.players.find(p => p.player_id === data.player_id);
+            if (!player) return;
+
+            const isCurrentPlayer = data.player_id === currentPlayerId;
+            if (isCurrentPlayer) {
+                const nameSpan = listItem.querySelector('.player-name-editable');
+                if (nameSpan) {
+                    nameSpan.textContent = `${player.name} ✏️`;
+                }
+            } else {
+                const nameSpan = listItem.querySelector('.player-name');
+                if (nameSpan) {
+                    nameSpan.textContent = `${player.name}${player.connected ? '' : ' (disconnected)'}`;
+                }
             }
         });
 

@@ -13,7 +13,9 @@
       "mcp__firefox__browser_console_messages",
       "mcp__firefox__browser_type",
       "mcp__firefox__browser_tabs",
-      "mcp__firefox__browser_snapshot"
+      "mcp__firefox__browser_snapshot",
+      "mcp__firefox__browser_handle_dialog",
+      "mcp__firefox__browser_evaluate"
     ]
   }
 }
