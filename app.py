@@ -272,6 +272,31 @@ def handle_skip_word(data):
         'action': 'skip'
     }, room=game_id)
 
+@socketio.on('rename_player')
+def handle_rename_player(data):
+    game_id = data['game_id']
+    player_id = data['player_id']
+    new_name = data['new_name'].strip()
+
+    if game_id not in games:
+        emit('error', {'message': 'Game not found'})
+        return
+
+    if not new_name:
+        emit('error', {'message': 'Name cannot be empty'})
+        return
+
+    game = games[game_id]
+    if player_id in game['players']:
+        game['players'][player_id]['name'] = new_name
+        game['last_activity'] = datetime.now()
+
+        emit('player_renamed', {
+            'player_id': player_id,
+            'new_name': new_name,
+            'game_state': get_game_state(game_id)
+        }, room=game_id)
+
 @socketio.on('end_round')
 def handle_end_round(data):
     game_id = data['game_id']
@@ -438,6 +463,16 @@ HTML_TEMPLATE = """
         .player-item.highlight {
             background: rgba(255, 215, 0, 0.3);
             border: 2px solid gold;
+        }
+
+        .player-name-editable {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .player-name-editable:hover {
+            opacity: 0.7;
+            text-decoration: underline;
         }
 
         .timer {
@@ -850,7 +885,48 @@ HTML_TEMPLATE = """
             }, 2000);
         }
 
+        function editPlayerName(playerId, currentName) {
+            const playersList = document.getElementById('lobby-players');
+            const items = playersList.querySelectorAll('.player-item');
+
+            items.forEach(item => {
+                const nameSpan = item.querySelector('.player-name-editable');
+                if (nameSpan) {
+                    const nameText = nameSpan.textContent.replace(' ✏️', '').trim();
+                    if (nameText === currentName) {
+                        const player = currentGameState.players.find(p => p.player_id === playerId);
+                        item.innerHTML = `
+                            <span style="display: flex; align-items: center; gap: 10px;">
+                                <input type="text" id="edit-name-input" value="${currentName}" onkeypress="if(event.key === 'Enter') savePlayerName('${playerId}')" style="padding: 8px; border-radius: 5px; border: none; font-size: 1em;">
+                                <button onclick="savePlayerName('${playerId}')" style="background: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 1.2em;">✓</button>
+                            </span>
+                            <span>Score: ${player.score}</span>
+                        `;
+                        const input = document.getElementById('edit-name-input');
+                        input.focus();
+                        input.select();
+                    }
+                }
+            });
+        }
+
+        function savePlayerName(playerId) {
+            const input = document.getElementById('edit-name-input');
+            const newName = input.value.trim();
+
+            if (newName) {
+                socket.emit('rename_player', {
+                    game_id: currentGameId,
+                    player_id: playerId,
+                    new_name: newName
+                });
+            }
+        }
+
+        let currentGameState = null;
+
         function renderLobby(gameState) {
+            currentGameState = gameState;
             document.getElementById('lobby-game-code').textContent = gameState.game_id;
             const gameUrl = `${window.location.origin}/game/${gameState.game_id}`;
             document.getElementById('lobby-game-url').textContent = gameUrl;
@@ -861,8 +937,14 @@ HTML_TEMPLATE = """
             gameState.players.forEach(player => {
                 const li = document.createElement('li');
                 li.className = 'player-item';
+
+                const isCurrentPlayer = player.player_id === currentPlayerId;
+                const nameDisplay = isCurrentPlayer
+                    ? `<span class="player-name-editable" onclick="editPlayerName('${player.player_id}', '${player.name}')">${player.name} ✏️</span>`
+                    : `<span>${player.name}${player.connected ? '' : ' (disconnected)'}</span>`;
+
                 li.innerHTML = `
-                    <span>${player.name}${player.connected ? '' : ' (disconnected)'}</span>
+                    ${nameDisplay}
                     <span>Score: ${player.score}</span>
                 `;
                 playersList.appendChild(li);
@@ -903,6 +985,12 @@ HTML_TEMPLATE = """
         });
 
         socket.on('player_joined', (data) => {
+            if (data.game_state.state === 'lobby') {
+                renderLobby(data.game_state);
+            }
+        });
+
+        socket.on('player_renamed', (data) => {
             if (data.game_state.state === 'lobby') {
                 renderLobby(data.game_state);
             }
