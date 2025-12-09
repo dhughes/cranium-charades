@@ -1,6 +1,8 @@
 # Cranium Charades 🧠
 
-Forehead word guessing game - hold your phone up and guess the word from your friends' clues!
+Real-time multiplayer word-guessing game for remote teams playing over Zoom or voice calls. Players take turns being the "guesser" while teammates give hints. Race against a 60-second timer to guess as many words as possible!
+
+**See [REQUIREMENTS.md](REQUIREMENTS.md) for complete game mechanics and technical details.**
 
 ## Local Development
 

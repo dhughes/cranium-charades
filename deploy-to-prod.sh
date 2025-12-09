@@ -10,6 +10,6 @@ echo "📤 Pushing local changes to git..."
 git push
 
 echo "🔗 Connecting to server and running deployment..."
-ssh ${SERVER_USER}@${SERVER_HOST} 'bash ~/apps/cranium-charades/deploy.sh'
+ssh ${SERVER_USER}@${SERVER_HOST} 'cd ~/apps/cranium-charades && bash deploy.sh'
 
 echo "✅ Production deployment complete!"
