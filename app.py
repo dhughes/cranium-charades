@@ -817,7 +817,7 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
-        const socket = io();
+        const socket = io({path: window.location.pathname.replace(/\/$/, '') + '/socket.io'});
         let currentGameId = null;
         let currentPlayerId = null;
         let isGuesser = false;
