@@ -12,10 +12,14 @@ echo "📦 Updating dependencies..."
 source venv/bin/activate
 pip install -r requirements.txt
 
+echo "🔧 Updating Caddy configuration..."
+sudo ~/infrastructure/deploy.sh caddy
+
 # Restart service
 echo "🔄 Restarting service..."
 sudo systemctl restart cranium-charades
 
 # Show status
 echo "✅ Deployment complete!"
-systemctl status cranium-charades --no-pager
+echo "📊 Service status:"
+systemctl status cranium-charades
