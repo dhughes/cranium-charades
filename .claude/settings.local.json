@@ -15,7 +15,8 @@
       "mcp__firefox__browser_tabs",
       "mcp__firefox__browser_snapshot",
       "mcp__firefox__browser_handle_dialog",
-      "mcp__firefox__browser_evaluate"
+      "mcp__firefox__browser_evaluate",
+      "mcp__firefox__browser_press_key"
     ]
   }
 }
