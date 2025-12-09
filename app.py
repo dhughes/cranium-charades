@@ -725,9 +725,10 @@ HTML_TEMPLATE = """
                 <div id="game-code-display" style="display:none;">
                     <p class="text-center mb-10">Game Code:</p>
                     <div class="game-code" id="game-code"></div>
-                    <p class="text-center mb-10">Share this link:</p>
-                    <div class="share-link" id="share-link"></div>
-                    <button class="btn-primary" onclick="copyShareLink()">Copy Link</button>
+                    <div class="game-footer" style="margin: 20px 0;">
+                        <div class="game-url" id="share-link"></div>
+                        <button class="copy-icon" onclick="copyShareLink()" title="Copy link">📋</button>
+                    </div>
                     <div style="margin-top: 20px;">
                         <input type="text" id="creator-name" placeholder="Enter your name" onkeypress="if(event.key === 'Enter') joinAsCreator()">
                         <button class="btn-success" onclick="joinAsCreator()">Join Game</button>
@@ -835,9 +836,15 @@ HTML_TEMPLATE = """
         }
 
         function copyShareLink() {
-            const link = document.getElementById('share-link').textContent;
-            navigator.clipboard.writeText(link);
-            showToast('Link copied to clipboard!', 'warning');
+            const urlElement = document.getElementById('share-link');
+            const originalUrl = urlElement.textContent;
+
+            navigator.clipboard.writeText(originalUrl);
+
+            urlElement.textContent = '✓ Copied to clipboard!';
+            setTimeout(() => {
+                urlElement.textContent = originalUrl;
+            }, 2000);
         }
 
         function joinAsCreator() {
