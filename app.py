@@ -817,7 +817,9 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
-        const socket = io({path: '/cranium-charades/socket.io'});
+        const isProduction = window.location.pathname.startsWith('/cranium-charades');
+        const socketPath = isProduction ? '/cranium-charades/socket.io' : '/socket.io';
+        const socket = io({path: socketPath});
         let currentGameId = null;
         let currentPlayerId = null;
         let isGuesser = false;
