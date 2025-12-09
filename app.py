@@ -9,7 +9,7 @@ import uuid
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'cranium-charades-secret-key'
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", engineio_logger=True, logger=True)
 
 with open('words.json', 'r') as f:
     WORDS = json.load(f)
@@ -817,9 +817,7 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
-        const isProduction = window.location.pathname.startsWith('/cranium-charades');
-        const socketPath = isProduction ? '/cranium-charades/socket.io' : '/socket.io';
-        const socket = io({path: socketPath});
+        const socket = io();
         let currentGameId = null;
         let currentPlayerId = null;
         let isGuesser = false;
