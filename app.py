@@ -991,9 +991,36 @@ HTML_TEMPLATE = """
         });
 
         socket.on('player_renamed', (data) => {
-            if (data.game_state.state === 'lobby') {
-                renderLobby(data.game_state);
-            }
+            currentGameState = data.game_state;
+
+            const playersList = document.getElementById('lobby-players');
+            const items = playersList.querySelectorAll('.player-item');
+
+            items.forEach(item => {
+                const editInput = item.querySelector('#edit-name-input');
+                if (editInput) {
+                    return;
+                }
+
+                const nameSpan = item.querySelector('.player-name-editable');
+                if (nameSpan) {
+                    const player = data.game_state.players.find(p => p.player_id === data.player_id);
+                    if (player && player.player_id === currentPlayerId) {
+                        nameSpan.textContent = `${player.name} ✏️`;
+                    }
+                } else {
+                    const textSpan = item.querySelector('span');
+                    if (textSpan) {
+                        const player = data.game_state.players.find(p => {
+                            const nameMatch = textSpan.textContent.includes(p.name);
+                            return nameMatch && p.player_id === data.player_id;
+                        });
+                        if (player) {
+                            textSpan.textContent = `${player.name}${player.connected ? '' : ' (disconnected)'}`;
+                        }
+                    }
+                }
+            });
         });
 
         socket.on('round_started', (data) => {
