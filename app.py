@@ -1012,7 +1012,8 @@ HTML_TEMPLATE = """
         function renderLobby(gameState) {
             currentGameState = gameState;
             document.getElementById('lobby-game-code').textContent = gameState.game_id;
-            const gameUrl = `${window.location.origin}/game/${gameState.game_id}`;
+            const basePath = window.location.pathname.replace(/\/$/, '');
+            const gameUrl = `${window.location.origin}${basePath}/game/${gameState.game_id}`;
             document.getElementById('lobby-game-url').textContent = gameUrl;
 
             const playersList = document.getElementById('lobby-players');
@@ -1040,7 +1041,8 @@ HTML_TEMPLATE = """
 
         socket.on('game_created', (data) => {
             currentGameId = data.game_id;
-            const shareUrl = `${window.location.origin}/game/${data.game_id}`;
+            const basePath = window.location.pathname.replace(/\/$/, '');
+            const shareUrl = `${window.location.origin}${basePath}/game/${data.game_id}`;
 
             document.getElementById('game-code').textContent = data.game_id;
             document.getElementById('share-link').textContent = shareUrl;
