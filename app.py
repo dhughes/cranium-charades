@@ -803,7 +803,7 @@ HTML_TEMPLATE = """
             document.getElementById('ready-category').textContent = data.category;
 
             if (isGuesser) {
-                document.getElementById('ready-message').textContent = 'Click Start when you\'re ready!';
+                document.getElementById('ready-message').textContent = "Click Start when you're ready!";
                 document.getElementById('start-button').style.display = 'block';
                 document.getElementById('ready-waiting').style.display = 'none';
             } else {

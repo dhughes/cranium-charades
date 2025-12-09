@@ -4,7 +4,16 @@
       "Bash(source venv/bin/activate)",
       "Bash(pip install:*)",
       "Bash(python app.py:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "mcp__firefox__browser_navigate",
+      "mcp__firefox__browser_install",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "mcp__firefox__browser_click",
+      "mcp__firefox__browser_console_messages",
+      "mcp__firefox__browser_type",
+      "mcp__firefox__browser_tabs",
+      "mcp__firefox__browser_snapshot"
     ]
   }
 }
