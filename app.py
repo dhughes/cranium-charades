@@ -235,7 +235,8 @@ def handle_correct_guess(data):
     emit('word_changed', {
         'word': word,
         'round_score': game['round_score'],
-        'game_state': get_game_state(game_id)
+        'game_state': get_game_state(game_id),
+        'action': 'correct'
     }, room=game_id)
 
 @socketio.on('skip_word')
@@ -261,7 +262,8 @@ def handle_skip_word(data):
     emit('word_changed', {
         'word': word,
         'round_score': game['round_score'],
-        'game_state': get_game_state(game_id)
+        'game_state': get_game_state(game_id),
+        'action': 'skip'
     }, room=game_id)
 
 @socketio.on('end_round')
@@ -523,6 +525,48 @@ HTML_TEMPLATE = """
         .mb-20 {
             margin-bottom: 20px;
         }
+
+        .flash-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            font-weight: bold;
+            padding: 40px 60px;
+            border-radius: 20px;
+            z-index: 1000;
+            animation: flashIn 1.2s ease-out;
+            pointer-events: none;
+        }
+
+        .flash-correct {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.5);
+        }
+
+        .flash-skip {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            box-shadow: 0 10px 40px rgba(245, 158, 11, 0.5);
+            top: 20%;
+        }
+
+        @keyframes flashIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -732,6 +776,17 @@ HTML_TEMPLATE = """
             }
         }
 
+        function showFlash(message, type) {
+            const flash = document.createElement('div');
+            flash.className = `flash-message flash-${type}`;
+            flash.textContent = message;
+            document.body.appendChild(flash);
+
+            setTimeout(() => {
+                flash.remove();
+            }, 1200);
+        }
+
         function renderLobby(gameState) {
             document.getElementById('lobby-game-code').textContent = gameState.game_id;
 
@@ -836,6 +891,16 @@ HTML_TEMPLATE = """
         });
 
         socket.on('word_changed', (data) => {
+            if (data.action === 'correct') {
+                if (isGuesser) {
+                    showFlash('✓ CORRECT!', 'correct');
+                }
+            } else if (data.action === 'skip') {
+                if (!isGuesser) {
+                    showFlash('SKIPPED', 'skip');
+                }
+            }
+
             if (!isGuesser) {
                 document.getElementById('hinter-word').textContent = data.word;
             }
