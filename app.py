@@ -491,6 +491,47 @@ HTML_TEMPLATE = """
             font-weight: 600;
         }
 
+        .game-code-subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            margin: 10px 0 20px;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .game-footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .game-url {
+            flex: 1;
+            font-size: 0.85em;
+            word-break: break-all;
+            opacity: 0.9;
+        }
+
+        .copy-icon {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background 0.2s;
+            width: auto;
+            margin: 0;
+        }
+
+        .copy-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         .share-link {
             word-break: break-all;
             background: rgba(255, 255, 255, 0.9);
@@ -617,11 +658,15 @@ HTML_TEMPLATE = """
 
         <div id="lobby-screen" class="screen">
             <h1>Game Lobby</h1>
+            <div class="game-code-subtitle" id="lobby-game-code"></div>
             <div class="card">
-                <div class="game-code" id="lobby-game-code"></div>
                 <h2 class="text-center mb-20">Players</h2>
                 <ul class="players-list" id="lobby-players"></ul>
                 <button class="btn-primary" onclick="startRound()">It's my turn!</button>
+            </div>
+            <div class="game-footer">
+                <div class="game-url" id="lobby-game-url"></div>
+                <button class="copy-icon" onclick="copyGameUrl()" title="Copy link">📋</button>
             </div>
         </div>
 
@@ -793,8 +838,22 @@ HTML_TEMPLATE = """
             }, 1200);
         }
 
+        function copyGameUrl() {
+            const urlElement = document.getElementById('lobby-game-url');
+            const originalUrl = urlElement.textContent;
+
+            navigator.clipboard.writeText(originalUrl);
+
+            urlElement.textContent = '✓ Copied to clipboard!';
+            setTimeout(() => {
+                urlElement.textContent = originalUrl;
+            }, 2000);
+        }
+
         function renderLobby(gameState) {
             document.getElementById('lobby-game-code').textContent = gameState.game_id;
+            const gameUrl = `${window.location.origin}/game/${gameState.game_id}`;
+            document.getElementById('lobby-game-url').textContent = gameUrl;
 
             const playersList = document.getElementById('lobby-players');
             playersList.innerHTML = '';
