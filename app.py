@@ -55,6 +55,7 @@ def create_game():
         'current_category': None,
         'current_word': None,
         'round_score': 0,
+        'round_skips': 0,
         'timer_start': None,
         'timer_duration': 60,
         'words_used_this_round': [],
@@ -87,6 +88,7 @@ def get_game_state(game_id):
             'player_id': pid,
             'name': player['name'],
             'score': player['score'],
+            'skips': player['skips'],
             'connected': player['connected']
         })
 
@@ -102,6 +104,7 @@ def get_game_state(game_id):
         'current_guesser_id': game['current_guesser_id'],
         'current_category': game['current_category'],
         'round_score': game['round_score'],
+        'round_skips': game['round_skips'],
         'time_remaining': time_remaining,
         'categories': list(WORDS.keys())
     }
@@ -134,6 +137,7 @@ def handle_join_game(data):
     games[game_id]['players'][player_id] = {
         'name': player_name,
         'score': 0,
+        'skips': 0,
         'connected': True,
         'sid': request.sid
     }
@@ -170,6 +174,7 @@ def handle_start_round(data):
     game['state'] = 'category_selection'
     game['current_guesser_id'] = player_id
     game['round_score'] = 0
+    game['round_skips'] = 0
     game['words_used_this_round'] = []
     game['last_activity'] = datetime.now()
 
@@ -262,12 +267,14 @@ def handle_skip_word(data):
     if time_remaining <= 0:
         return
 
+    game['round_skips'] += 1
     game['last_activity'] = datetime.now()
     word = get_next_word(game_id)
 
     emit('word_changed', {
         'word': word,
         'round_score': game['round_score'],
+        'round_skips': game['round_skips'],
         'game_state': get_game_state(game_id),
         'action': 'skip'
     }, room=game_id)
@@ -309,6 +316,7 @@ def handle_end_round(data):
 
     if game['current_guesser_id']:
         game['players'][game['current_guesser_id']]['score'] += game['round_score']
+        game['players'][game['current_guesser_id']]['skips'] += game['round_skips']
 
     game['state'] = 'lobby'
     game['timer_start'] = None
@@ -317,6 +325,7 @@ def handle_end_round(data):
 
     emit('round_ended', {
         'final_score': game['round_score'],
+        'final_skips': game['round_skips'],
         'guesser_id': game['current_guesser_id'],
         'game_state': get_game_state(game_id)
     }, room=game_id)
@@ -732,7 +741,7 @@ HTML_TEMPLATE = """
             <h1>Guess the Word!</h1>
             <div class="card">
                 <div class="timer" id="guesser-timer">60</div>
-                <div class="score">Score: <span id="guesser-score">0</span></div>
+                <div class="score">Score: <span id="guesser-score">0</span> | Skips: <span id="guesser-skips">0</span></div>
                 <p class="text-center">Listen to your teammates' hints!</p>
                 <button class="btn-danger" onclick="skipWord()">Skip</button>
             </div>
@@ -743,7 +752,7 @@ HTML_TEMPLATE = """
             <div class="card">
                 <div class="timer" id="hinter-timer">60</div>
                 <div class="word-display" id="hinter-word"></div>
-                <div class="score">Guesser Score: <span id="hinter-score">0</span></div>
+                <div class="score">Score: <span id="hinter-score">0</span> | Skips: <span id="hinter-skips">0</span></div>
                 <button class="btn-success" onclick="correctGuess()">Got it!</button>
             </div>
         </div>
@@ -900,7 +909,7 @@ HTML_TEMPLATE = """
                                 <input type="text" id="edit-name-input" value="${currentName}" onkeypress="if(event.key === 'Enter') savePlayerName('${playerId}')" style="padding: 8px; border-radius: 5px; border: none; font-size: 1em;">
                                 <button onclick="savePlayerName('${playerId}')" style="background: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 1.2em;">✓</button>
                             </span>
-                            <span>Score: ${player.score}</span>
+                            <span>Score: ${player.score} | Skips: ${player.skips}</span>
                         `;
                         const input = document.getElementById('edit-name-input');
                         input.focus();
@@ -946,7 +955,7 @@ HTML_TEMPLATE = """
 
                 li.innerHTML = `
                     ${nameDisplay}
-                    <span>Score: ${player.score}</span>
+                    <span>Score: ${player.score} | Skips: ${player.skips}</span>
                 `;
                 playersList.appendChild(li);
             });
@@ -1064,11 +1073,13 @@ HTML_TEMPLATE = """
         socket.on('timer_started', (data) => {
             if (isGuesser) {
                 document.getElementById('guesser-score').textContent = '0';
+                document.getElementById('guesser-skips').textContent = '0';
                 document.getElementById('guesser-timer').textContent = '60';
                 showScreen('active-round-guesser-screen');
             } else {
                 document.getElementById('hinter-word').textContent = data.word;
                 document.getElementById('hinter-score').textContent = '0';
+                document.getElementById('hinter-skips').textContent = '0';
                 document.getElementById('hinter-timer').textContent = '60';
                 showScreen('active-round-hinter-screen');
             }
@@ -1097,6 +1108,11 @@ HTML_TEMPLATE = """
             }
             document.getElementById('guesser-score').textContent = data.round_score;
             document.getElementById('hinter-score').textContent = data.round_score;
+
+            if (data.round_skips !== undefined) {
+                document.getElementById('guesser-skips').textContent = data.round_skips;
+                document.getElementById('hinter-skips').textContent = data.round_skips;
+            }
         });
 
         socket.on('round_ended', (data) => {
