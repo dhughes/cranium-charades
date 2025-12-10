@@ -59,6 +59,7 @@ def create_game():
         'timer_start': None,
         'timer_duration': 60,
         'words_used_this_round': [],
+        'last_word_change': None,
         'last_activity': datetime.now()
     }
     return game_id
@@ -223,6 +224,7 @@ def handle_start_timer(data):
     game = games[game_id]
     game['state'] = 'active_round'
     game['timer_start'] = time.time()
+    game['last_word_change'] = None
     game['last_activity'] = datetime.now()
 
     word = get_next_word(game_id)
@@ -249,8 +251,13 @@ def handle_correct_guess(data):
     if time_remaining <= 0:
         return
 
+    current_time = time.time()
+    if game['last_word_change'] and (current_time - game['last_word_change']) < 0.3:
+        return
+
     game['round_score'] += 1
     game['last_activity'] = datetime.now()
+    game['last_word_change'] = current_time
 
     word = get_next_word(game_id)
 
@@ -278,8 +285,14 @@ def handle_skip_word(data):
     if time_remaining <= 0:
         return
 
+    current_time = time.time()
+    if game['last_word_change'] and (current_time - game['last_word_change']) < 0.3:
+        return
+
     game['round_skips'] += 1
     game['last_activity'] = datetime.now()
+    game['last_word_change'] = current_time
+
     word = get_next_word(game_id)
 
     emit('word_changed', {
