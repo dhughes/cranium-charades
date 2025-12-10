@@ -359,7 +359,7 @@ HTML_TEMPLATE = """
 <head>
     <title>Cranium Charades</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
     <style>
         * {
             margin: 0;
