@@ -1272,6 +1272,11 @@ HTML_TEMPLATE = """
 
         socket.on('error', (data) => {
             showToast(data.message, 'error');
+            if (data.message === 'Game not found') {
+                localStorage.removeItem('cranium_game_id');
+                localStorage.removeItem('cranium_player_name');
+                showScreen('landing-screen');
+            }
         });
 
         const path = window.location.pathname;
