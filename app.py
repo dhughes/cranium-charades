@@ -1226,9 +1226,7 @@ HTML_TEMPLATE = """
                     showFlash('✓ CORRECT!', 'correct');
                 }
             } else if (data.action === 'skip') {
-                if (!isGuesser) {
-                    showFlash('SKIPPED', 'skip');
-                }
+                showFlash('SKIPPED', 'skip');
             }
 
             if (!isGuesser) {
