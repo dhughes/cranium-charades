@@ -382,9 +382,9 @@ HTML_TEMPLATE = """
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             min-height: 100vh;
-            color: white;
+            color: #f1f5f9;
             padding: 20px;
         }
 
@@ -420,11 +420,12 @@ HTML_TEMPLATE = """
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
+            background: #1e293b;
+            border: 2px solid #334155;
             border-radius: 15px;
             padding: 30px;
             margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         button {
@@ -441,7 +442,7 @@ HTML_TEMPLATE = """
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
         }
 
         button:active {
@@ -449,22 +450,23 @@ HTML_TEMPLATE = """
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
             color: white;
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.9);
-            color: #667eea;
+            background: #334155;
+            color: #f1f5f9;
+            border: 2px solid #475569;
         }
 
         .btn-success {
-            background: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
         }
 
         .btn-danger {
-            background: #ef4444;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
         }
 
@@ -472,10 +474,16 @@ HTML_TEMPLATE = """
             width: 100%;
             padding: 15px;
             font-size: 1.1em;
-            border: none;
+            border: 2px solid #475569;
             border-radius: 10px;
             margin: 10px 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #06b6d4;
         }
 
         .players-list {
@@ -484,7 +492,8 @@ HTML_TEMPLATE = """
         }
 
         .player-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: #0f172a;
+            border: 2px solid #475569;
             padding: 15px;
             margin: 10px 0;
             border-radius: 10px;
@@ -494,8 +503,9 @@ HTML_TEMPLATE = """
         }
 
         .player-item.highlight {
-            background: rgba(255, 215, 0, 0.3);
-            border: 2px solid gold;
+            background: #fef3c7;
+            color: #78350f;
+            border: 2px solid #fbbf24;
         }
 
         .player-name-editable {
@@ -513,6 +523,7 @@ HTML_TEMPLATE = """
             text-align: center;
             margin: 20px 0;
             font-weight: bold;
+            color: #06b6d4;
         }
 
         .timer.warning {
@@ -520,7 +531,7 @@ HTML_TEMPLATE = """
         }
 
         .timer.danger {
-            color: #ef4444;
+            color: #f97316;
             animation: pulse 1s infinite;
         }
 
@@ -534,19 +545,22 @@ HTML_TEMPLATE = """
             text-align: center;
             margin: 30px 0;
             padding: 40px;
-            background: rgba(255, 255, 255, 0.2);
+            background: #06b6d4;
+            color: white;
             border-radius: 15px;
             font-weight: bold;
             min-height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 5px 20px rgba(6, 182, 212, 0.3);
         }
 
         .score {
             font-size: 2em;
             text-align: center;
             margin: 20px 0;
+            color: #06b6d4;
         }
 
         .game-code {
@@ -554,23 +568,26 @@ HTML_TEMPLATE = """
             font-size: 1.3em;
             margin: 20px 0;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.2);
+            background: #0f172a;
+            border: 2px solid #06b6d4;
             border-radius: 10px;
             font-weight: 600;
+            color: #06b6d4;
         }
 
         .game-code-subtitle {
             text-align: center;
             font-size: 1.1em;
             margin: 10px 0 20px;
-            opacity: 0.8;
+            color: #94a3b8;
             font-weight: 500;
         }
 
         .game-footer {
             margin-top: 20px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
+            background: #0f172a;
+            border: 2px solid #475569;
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -581,12 +598,12 @@ HTML_TEMPLATE = """
             flex: 1;
             font-size: 0.85em;
             word-break: break-all;
-            opacity: 0.9;
+            color: #94a3b8;
         }
 
         .copy-icon {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
+            background: #334155;
+            border: 2px solid #475569;
             padding: 10px 15px;
             border-radius: 8px;
             cursor: pointer;
@@ -597,7 +614,7 @@ HTML_TEMPLATE = """
         }
 
         .copy-icon:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #475569;
         }
 
         .share-link {
