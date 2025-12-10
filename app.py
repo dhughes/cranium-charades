@@ -752,7 +752,7 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <div id="landing-screen" class="screen active">
+        <div id="landing-screen" class="screen">
             <div class="emoji">🧠</div>
             <h1>Cranium Charades</h1>
             <div class="card">
@@ -1300,6 +1300,8 @@ HTML_TEMPLATE = """
             } else {
                 showJoinGame();
             }
+        } else {
+            showScreen('landing-screen');
         }
     </script>
 </body>
