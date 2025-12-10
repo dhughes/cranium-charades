@@ -505,7 +505,10 @@ HTML_TEMPLATE = """
         .player-item.highlight {
             background: #fef3c7;
             color: #78350f;
-            border: 2px solid #fbbf24;
+            border: 3px solid #fbbf24;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3);
+            font-size: 1.1em;
         }
 
         .player-name-editable {
@@ -1045,6 +1048,7 @@ HTML_TEMPLATE = """
         }
 
         let currentGameState = null;
+        let lastGuesserId = null;
 
         function renderLobby(gameState) {
             currentGameState = gameState;
@@ -1060,10 +1064,16 @@ HTML_TEMPLATE = """
             const playersList = document.getElementById('lobby-players');
             playersList.innerHTML = '';
 
-            gameState.players.forEach(player => {
+            const sortedPlayers = [...gameState.players].sort((a, b) => b.score - a.score);
+
+            sortedPlayers.forEach(player => {
                 const li = document.createElement('li');
                 li.className = 'player-item';
                 li.setAttribute('data-player-id', player.player_id);
+
+                if (player.player_id === lastGuesserId) {
+                    li.classList.add('highlight');
+                }
 
                 const isCurrentPlayer = player.player_id === currentPlayerId;
                 const nameDisplay = isCurrentPlayer
@@ -1156,6 +1166,7 @@ HTML_TEMPLATE = """
         });
 
         socket.on('round_started', (data) => {
+            lastGuesserId = null;
             isGuesser = (data.game_state.current_guesser_id === currentPlayerId);
 
             if (isGuesser) {
@@ -1246,6 +1257,7 @@ HTML_TEMPLATE = """
                 clearInterval(timerInterval);
                 timerInterval = null;
             }
+            lastGuesserId = data.guesser_id;
             renderLobby(data.game_state);
         });
 
