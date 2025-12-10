@@ -1151,22 +1151,21 @@ HTML_TEMPLATE = """
         socket.on('player_renamed', (data) => {
             currentGameState = data.game_state;
 
-            const listItem = document.querySelector(`[data-player-id="${data.player_id}"]`);
-            if (!listItem) return;
-
-            if (listItem.querySelector('#edit-name-input')) {
-                return;
-            }
-
             const player = data.game_state.players.find(p => p.player_id === data.player_id);
             if (!player) return;
 
+            if (data.player_id === currentPlayerId) {
+                localStorage.setItem('cranium_player_name', player.name);
+            }
+
+            const listItem = document.querySelector(`[data-player-id="${data.player_id}"]`);
+            if (!listItem) return;
+
             const isCurrentPlayer = data.player_id === currentPlayerId;
             if (isCurrentPlayer) {
-                const nameSpan = listItem.querySelector('.player-name-editable');
-                if (nameSpan) {
-                    nameSpan.textContent = `${player.name} ✏️`;
-                }
+                const nameDisplay = `<span class="player-name-editable" onclick="editPlayerName('${player.player_id}', '${player.name}')">${player.name} ✏️</span>`;
+                const scoreDisplay = `<span>Score: ${player.score} | Skips: ${player.skips}</span>`;
+                listItem.innerHTML = `${nameDisplay}${scoreDisplay}`;
             } else {
                 const nameSpan = listItem.querySelector('.player-name');
                 if (nameSpan) {
