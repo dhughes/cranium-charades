@@ -338,6 +338,9 @@ def handle_end_round(data):
 
     game = games[game_id]
 
+    if game['state'] != 'active_round':
+        return
+
     if game['current_guesser_id']:
         game['players'][game['current_guesser_id']]['score'] += game['round_score']
         game['players'][game['current_guesser_id']]['skips'] += game['round_skips']
