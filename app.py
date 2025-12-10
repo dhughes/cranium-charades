@@ -846,7 +846,7 @@ HTML_TEMPLATE = """
 
         function showJoinGame() {
             const path = window.location.pathname;
-            if (path.startsWith('/game/')) {
+            if (path.includes('/game/')) {
                 const gameCode = path.split('/game/')[1];
                 document.getElementById('join-game-code').value = gameCode;
             }
@@ -1019,8 +1019,12 @@ HTML_TEMPLATE = """
         function renderLobby(gameState) {
             currentGameState = gameState;
             document.getElementById('lobby-game-code').textContent = gameState.game_id;
-            const basePath = window.location.pathname.replace(/\/$/, '');
-            const gameUrl = `${window.location.origin}${basePath}/game/${gameState.game_id}`;
+            let urlBase = window.location.pathname;
+            if (urlBase.includes('/game/')) {
+                urlBase = urlBase.split('/game/')[0];
+            }
+            urlBase = urlBase.replace(/\/$/, '');
+            const gameUrl = `${window.location.origin}${urlBase}/game/${gameState.game_id}`;
             document.getElementById('lobby-game-url').textContent = gameUrl;
 
             const playersList = document.getElementById('lobby-players');
@@ -1048,8 +1052,12 @@ HTML_TEMPLATE = """
 
         socket.on('game_created', (data) => {
             currentGameId = data.game_id;
-            const basePath = window.location.pathname.replace(/\/$/, '');
-            const shareUrl = `${window.location.origin}${basePath}/game/${data.game_id}`;
+            let urlBase = window.location.pathname;
+            if (urlBase.includes('/game/')) {
+                urlBase = urlBase.split('/game/')[0];
+            }
+            urlBase = urlBase.replace(/\/$/, '');
+            const shareUrl = `${window.location.origin}${urlBase}/game/${data.game_id}`;
 
             document.getElementById('game-code').textContent = data.game_id;
             document.getElementById('share-link').textContent = shareUrl;
@@ -1218,7 +1226,7 @@ HTML_TEMPLATE = """
         });
 
         const path = window.location.pathname;
-        if (path.startsWith('/game/')) {
+        if (path.includes('/game/')) {
             const urlGameCode = path.split('/game/')[1];
             const savedGameId = localStorage.getItem('cranium_game_id');
             const savedPlayerName = localStorage.getItem('cranium_player_name');
