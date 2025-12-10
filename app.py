@@ -1115,6 +1115,16 @@ HTML_TEMPLATE = """
                 localStorage.setItem('cranium_player_name', player.name);
             }
 
+            let urlBase = window.location.pathname;
+            if (urlBase.includes('/game/')) {
+                urlBase = urlBase.split('/game/')[0];
+            }
+            urlBase = urlBase.replace(/\/$/, '');
+            const gameUrl = `${urlBase}/game/${currentGameId}`;
+            if (window.location.pathname !== gameUrl) {
+                history.pushState({}, '', gameUrl);
+            }
+
             if (data.game_state.state === 'active_round' && !isGuesser) {
                 document.getElementById('hinter-word').textContent = data.current_word || '';
                 document.getElementById('hinter-timer').textContent = Math.ceil(data.game_state.time_remaining || 60);
