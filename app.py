@@ -828,17 +828,44 @@ HTML_TEMPLATE = """
 
         .instructions-content h3 {
             color: #06b6d4;
+            margin-top: 20px;
             margin-bottom: 10px;
             font-size: 1.1em;
         }
 
+        .instructions-content h3:first-of-type {
+            margin-top: 0;
+        }
+
         .instructions-content ul {
             margin-left: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .instructions-content li {
-            margin: 5px 0;
+            margin: 8px 0;
+            color: #cbd5e1;
+        }
+
+        #landing-screen .card h3 {
+            color: #06b6d4;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        #landing-screen .card h3:first-of-type {
+            margin-top: 0;
+        }
+
+        #landing-screen .card ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        #landing-screen .card li {
+            margin: 8px 0;
+            color: #cbd5e1;
         }
     </style>
 </head>
