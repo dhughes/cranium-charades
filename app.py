@@ -1033,7 +1033,7 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="active-round-guesser-screen" class="screen">
-            <button class="leave-game" onclick="leaveGame()">Leave Game</button>
+            <button class="leave-game" onclick="endRound()">End Round</button>
             <h1>Guess the Word!</h1>
             <div class="card">
                 <div class="timer" id="guesser-timer">60</div>
@@ -1044,7 +1044,7 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="active-round-hinter-screen" class="screen">
-            <button class="leave-game" onclick="leaveGame()">Leave Game</button>
+            <button class="leave-game" onclick="endRound()">End Round</button>
             <h1>Give Hints!</h1>
             <div class="card">
                 <div class="timer" id="hinter-timer">60</div>
@@ -1077,6 +1077,14 @@ HTML_TEMPLATE = """
         function toggleInstructions() {
             const modal = document.getElementById('instructions-modal');
             modal.classList.toggle('show');
+        }
+
+        function endRound() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            socket.emit('end_round', { game_id: currentGameId });
         }
 
         function leaveGame() {
