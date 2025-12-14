@@ -751,9 +751,129 @@ HTML_TEMPLATE = """
                 transform: translateX(-50%) translateY(-20px);
             }
         }
+
+        .instructions {
+            margin-top: 20px;
+        }
+
+        .instructions-toggle {
+            background: transparent;
+            color: #94a3b8;
+            border: 2px solid #475569;
+            padding: 10px 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .instructions-toggle:hover {
+            background: #334155;
+            border-color: #06b6d4;
+            color: #06b6d4;
+        }
+
+        .instructions-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .instructions-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .instructions-content {
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            background: #1e293b;
+            border: 2px solid #06b6d4;
+            border-radius: 15px;
+            text-align: left;
+            font-size: 0.9em;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .instructions-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #334155;
+            border: none;
+            color: #f1f5f9;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .instructions-close:hover {
+            background: #475569;
+        }
+
+        .instructions-content h3 {
+            color: #06b6d4;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .instructions-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .instructions-content li {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
+    <div id="instructions-modal" class="instructions-modal" onclick="if(event.target === this) toggleInstructions()">
+        <div class="instructions-content">
+            <button class="instructions-close" onclick="toggleInstructions()">✕</button>
+            <h3 style="color: #06b6d4; margin-bottom: 15px; text-align: center;">How to Play</h3>
+
+            <h3>Game Setup</h3>
+            <ul>
+                <li>One person starts a new game and shares the link with teammates</li>
+                <li>Everyone joins the game using the shared link</li>
+                <li>No screen sharing needed - everyone views the game in their own browser</li>
+            </ul>
+
+            <h3>Playing a Round</h3>
+            <ul>
+                <li>Click "It's my turn!" to become the guesser</li>
+                <li>Choose a category (Movies, Animals, Foods, etc.)</li>
+                <li>The guesser has 60 seconds to guess as many words as possible</li>
+                <li>Teammates see the words and give hints over voice/video call</li>
+                <li>Click "Got it!" when the guesser says the correct word</li>
+                <li>Click "Skip" if you're stuck on a word</li>
+            </ul>
+
+            <h3>Scoring</h3>
+            <ul>
+                <li>Each correct guess = 1 point</li>
+                <li>Skips are tracked but don't affect score</li>
+                <li>Scores persist across rounds - highest score wins!</li>
+            </ul>
+        </div>
+    </div>
+
     <div class="container">
         <div id="landing-screen" class="screen">
             <div class="emoji">🧠</div>
@@ -762,6 +882,33 @@ HTML_TEMPLATE = """
                 <p class="text-center mb-20">Real-time multiplayer word-guessing game for remote teams!</p>
                 <button class="btn-primary" onclick="showCreateGame()">Start New Game</button>
                 <button class="btn-secondary" onclick="showJoinGame()">Join Game</button>
+            </div>
+            <div class="card">
+                <h3 style="color: #06b6d4; margin-bottom: 15px; text-align: center;">How to Play</h3>
+
+                <h3>Game Setup</h3>
+                <ul>
+                    <li>One person starts a new game and shares the link with teammates</li>
+                    <li>Everyone joins the game using the shared link</li>
+                    <li>No screen sharing needed - everyone views the game in their own browser</li>
+                </ul>
+
+                <h3>Playing a Round</h3>
+                <ul>
+                    <li>Click "It's my turn!" to become the guesser</li>
+                    <li>Choose a category (Movies, Animals, Foods, etc.)</li>
+                    <li>The guesser has 60 seconds to guess as many words as possible</li>
+                    <li>Teammates see the words and give hints over voice/video call</li>
+                    <li>Click "Got it!" when the guesser says the correct word</li>
+                    <li>Click "Skip" if you're stuck on a word</li>
+                </ul>
+
+                <h3>Scoring</h3>
+                <ul>
+                    <li>Each correct guess = 1 point</li>
+                    <li>Skips are tracked but don't affect score</li>
+                    <li>Scores persist across rounds - highest score wins!</li>
+                </ul>
             </div>
         </div>
 
@@ -805,6 +952,9 @@ HTML_TEMPLATE = """
             <div class="game-footer">
                 <div class="game-url" id="lobby-game-url"></div>
                 <button class="copy-icon" onclick="copyGameUrl()" title="Copy link">📋</button>
+            </div>
+            <div class="instructions">
+                <button class="instructions-toggle" onclick="toggleInstructions()">How to Play</button>
             </div>
         </div>
 
@@ -869,6 +1019,11 @@ HTML_TEMPLATE = """
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
+        }
+
+        function toggleInstructions() {
+            const modal = document.getElementById('instructions-modal');
+            modal.classList.toggle('show');
         }
 
         function showLanding() {
