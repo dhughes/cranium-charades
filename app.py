@@ -867,6 +867,29 @@ HTML_TEMPLATE = """
             margin: 8px 0;
             color: #cbd5e1;
         }
+
+        .leave-game {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #334155;
+            color: #94a3b8;
+            border: 2px solid #475569;
+            padding: 8px 16px;
+            font-size: 0.85em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 1500;
+            width: auto;
+            margin: 0;
+        }
+
+        .leave-game:hover {
+            background: #475569;
+            color: #f1f5f9;
+            transform: none;
+        }
     </style>
 </head>
 <body>
@@ -969,6 +992,7 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="lobby-screen" class="screen">
+            <button class="leave-game" onclick="leaveGame()">Leave Game</button>
             <h1>Game Lobby</h1>
             <div class="game-code-subtitle" id="lobby-game-code"></div>
             <div class="card">
@@ -1009,6 +1033,7 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="active-round-guesser-screen" class="screen">
+            <button class="leave-game" onclick="leaveGame()">Leave Game</button>
             <h1>Guess the Word!</h1>
             <div class="card">
                 <div class="timer" id="guesser-timer">60</div>
@@ -1019,6 +1044,7 @@ HTML_TEMPLATE = """
         </div>
 
         <div id="active-round-hinter-screen" class="screen">
+            <button class="leave-game" onclick="leaveGame()">Leave Game</button>
             <h1>Give Hints!</h1>
             <div class="card">
                 <div class="timer" id="hinter-timer">60</div>
@@ -1051,6 +1077,26 @@ HTML_TEMPLATE = """
         function toggleInstructions() {
             const modal = document.getElementById('instructions-modal');
             modal.classList.toggle('show');
+        }
+
+        function leaveGame() {
+            localStorage.removeItem('cranium_game_id');
+            localStorage.removeItem('cranium_player_name');
+            currentGameId = null;
+            currentPlayerId = null;
+            lastGuesserId = null;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            let urlBase = window.location.pathname;
+            if (urlBase.includes('/game/')) {
+                urlBase = urlBase.split('/game/')[0];
+            }
+            urlBase = urlBase.replace(/\/$/, '');
+            const landingUrl = urlBase || '/';
+            history.pushState({}, '', landingUrl);
+            showScreen('landing-screen');
         }
 
         function showLanding() {
