@@ -13,7 +13,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 echo "🔧 Updating Caddy configuration..."
-sudo ~/infrastructure/deploy.sh caddy
+sudo /mnt/data/infrastructure/deploy.sh caddy
 
 # Restart service
 echo "📋 Updating systemd unit..."
