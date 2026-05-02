@@ -17,9 +17,7 @@ sudo /mnt/data/infrastructure/deploy.sh caddy
 
 # Restart service
 echo "📋 Updating systemd unit..."
-sudo cp cranium-charades.service /etc/systemd/system/cranium-charades.service
-sudo chmod 644 /etc/systemd/system/cranium-charades.service
-sudo systemctl daemon-reload
+sudo /mnt/data/infrastructure/deploy.sh service cranium-charades
 echo "🔄 Restarting service..."
 sudo systemctl restart cranium-charades
 
